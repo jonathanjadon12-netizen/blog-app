@@ -28,7 +28,7 @@ function UserProfile() {
     const getArticles = async () => {
       setLoading(true);
       try {
-        const res = await axios.get("https://blog-app-8tzo.onrender.com/user-api/articles", { withCredentials: true });
+        const res = await axios.get("/user-api/articles");
 
         setArticles(res.data.payload);
       } catch (err) {

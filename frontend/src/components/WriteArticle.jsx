@@ -32,12 +32,11 @@ function WriteArticle() {
     setLoading(true);
 
     //add authorId to articleObj
-    articleObj.author=currentUser._id;
+    articleObj.author = currentUser._id || currentUser.userId;
     try {
       await axios.post(
-        "https://blog-app-8tzo.onrender.com/author-api/articles",
-        articleObj,
-        { withCredentials: true }
+        "/author-api/articles",
+        articleObj
       );
 
       toast.success("Article published successfully!");
