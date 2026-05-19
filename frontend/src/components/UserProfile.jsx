@@ -8,7 +8,6 @@ import {
   articleGrid,
   articleCardClass,
   articleTitle,
-  articleBody,
   ghostBtn,
   loadingClass,
   errorClass,
