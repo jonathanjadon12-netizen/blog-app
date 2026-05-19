@@ -3,6 +3,7 @@ import { authenticate } from "../services/authService.js";
 import { UserTypeModel } from "../models/UserModel.js";
 import bcrypt from "bcryptjs";
 import { verifyToken } from "../middlewares/verifyToken.js";
+import { ArticleModel } from "../models/ArticleModel.js";
 export const commonRouter = exp.Router();
 
 //login
@@ -73,6 +74,163 @@ commonRouter.get("/check-auth", verifyToken("USER","AUTHOR","ADMIN"), async (req
       message: "authenticated",
       payload: userObj,
     });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+// Add a comment
+commonRouter.post("/articles/:articleId/comments", verifyToken("USER", "AUTHOR", "ADMIN"), async (req, res) => {
+  const { articleId } = req.params;
+  const { comment } = req.body;
+  const user = req.user.userId;
+
+  try {
+    const article = await ArticleModel.findByIdAndUpdate(
+      articleId,
+      {
+        $push: {
+          comments: {
+            user,
+            comment,
+            likes: [],
+            dislikes: [],
+            replies: [],
+          },
+        },
+      },
+      { new: true, runValidators: true }
+    )
+    .populate("author", "firstName lastName profileImageUrl")
+    .populate("comments.user", "firstName lastName profileImageUrl")
+    .populate("comments.replies.user", "firstName lastName profileImageUrl");
+
+    if (!article) {
+      return res.status(404).json({ message: "Article not found" });
+    }
+
+    res.status(201).json({ message: "Comment added", payload: article });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+// Add a reply to a comment
+commonRouter.post("/articles/:articleId/comments/:commentId/replies", verifyToken("USER", "AUTHOR", "ADMIN"), async (req, res) => {
+  const { articleId, commentId } = req.params;
+  const { reply } = req.body;
+  const user = req.user.userId;
+
+  try {
+    const article = await ArticleModel.findOneAndUpdate(
+      { _id: articleId, "comments._id": commentId },
+      {
+        $push: {
+          "comments.$.replies": {
+            user,
+            reply,
+          },
+        },
+      },
+      { new: true }
+    )
+    .populate("author", "firstName lastName profileImageUrl")
+    .populate("comments.user", "firstName lastName profileImageUrl")
+    .populate("comments.replies.user", "firstName lastName profileImageUrl");
+
+    if (!article) {
+      return res.status(404).json({ message: "Article or comment not found" });
+    }
+
+    res.status(201).json({ message: "Reply added", payload: article });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+// Toggle Like
+commonRouter.post("/articles/:articleId/comments/:commentId/like", verifyToken("USER", "AUTHOR", "ADMIN"), async (req, res) => {
+  const { articleId, commentId } = req.params;
+  const user = req.user.userId;
+
+  try {
+    const articleDoc = await ArticleModel.findById(articleId);
+    if (!articleDoc) {
+      return res.status(404).json({ message: "Article not found" });
+    }
+
+    const comment = articleDoc.comments.id(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    const likedIndex = comment.likes.indexOf(user);
+    const dislikedIndex = comment.dislikes.indexOf(user);
+
+    if (likedIndex > -1) {
+      // Already liked, toggle off
+      comment.likes.splice(likedIndex, 1);
+    } else {
+      // Like it
+      comment.likes.push(user);
+      // Remove dislike if it exists
+      if (dislikedIndex > -1) {
+        comment.dislikes.splice(dislikedIndex, 1);
+      }
+    }
+
+    await articleDoc.save();
+
+    const populatedArticle = await ArticleModel.findById(articleId)
+      .populate("author", "firstName lastName profileImageUrl")
+      .populate("comments.user", "firstName lastName profileImageUrl")
+      .populate("comments.replies.user", "firstName lastName profileImageUrl");
+
+    res.status(200).json({ message: "Like updated", payload: populatedArticle });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+// Toggle Dislike
+commonRouter.post("/articles/:articleId/comments/:commentId/dislike", verifyToken("USER", "AUTHOR", "ADMIN"), async (req, res) => {
+  const { articleId, commentId } = req.params;
+  const user = req.user.userId;
+
+  try {
+    const articleDoc = await ArticleModel.findById(articleId);
+    if (!articleDoc) {
+      return res.status(404).json({ message: "Article not found" });
+    }
+
+    const comment = articleDoc.comments.id(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    const likedIndex = comment.likes.indexOf(user);
+    const dislikedIndex = comment.dislikes.indexOf(user);
+
+    if (dislikedIndex > -1) {
+      // Already disliked, toggle off
+      comment.dislikes.splice(dislikedIndex, 1);
+    } else {
+      // Dislike it
+      comment.dislikes.push(user);
+      // Remove like if it exists
+      if (likedIndex > -1) {
+        comment.likes.splice(likedIndex, 1);
+      }
+    }
+
+    await articleDoc.save();
+
+    const populatedArticle = await ArticleModel.findById(articleId)
+      .populate("author", "firstName lastName profileImageUrl")
+      .populate("comments.user", "firstName lastName profileImageUrl")
+      .populate("comments.replies.user", "firstName lastName profileImageUrl");
+
+    res.status(200).json({ message: "Dislike updated", payload: populatedArticle });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }

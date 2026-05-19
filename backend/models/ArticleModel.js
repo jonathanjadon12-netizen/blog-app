@@ -1,13 +1,49 @@
 import { Schema, model } from "mongoose";
 
-//Create user comment schema
+// Create nested comment reply schema
+const replySchema = new Schema({
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: "user",
+    required: true,
+  },
+  reply: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+// Create user comment schema
 const userCommentSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
     ref: "user",
+    required: true,
   },
   comment: {
     type: String,
+    required: true,
+  },
+  likes: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "user",
+    },
+  ],
+  dislikes: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "user",
+    },
+  ],
+  replies: [replySchema],
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 
