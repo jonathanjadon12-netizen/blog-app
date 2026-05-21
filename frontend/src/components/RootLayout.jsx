@@ -3,6 +3,7 @@ import Footer from "./Footer";
 import { Outlet } from "react-router";
 import { useEffect } from "react";
 import { useAuth } from "../store/authStore";
+import { pageBackground } from "../styles/common";
 
 function RootLayout() {
   const checkAuth = useAuth((state) => state.checkAuth);
@@ -18,11 +19,11 @@ function RootLayout() {
   }
 
   return (
-    <div>
+    <div className={`${pageBackground} flex flex-col min-h-screen`}>
       <Header />
-      <div className="min-h-screen mx-4 sm:mx-36">
+      <main className="flex-grow max-w-5xl mx-auto w-full px-6 py-10">
         <Outlet />
-      </div>
+      </main>
       <Footer />
     </div>
   );

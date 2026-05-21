@@ -214,13 +214,13 @@ function ArticleByID() {
         <img
           src={commenter.profileImageUrl}
           alt={commenter.firstName}
-          className={`${size} object-cover rounded-full border border-[#e8e8ed]`}
+          className={`${size} object-cover rounded-full border border-[#eae6df]`}
         />
       );
     }
     const initial = commenter?.firstName ? commenter.firstName[0] : "?";
     return (
-      <div className={`${size} bg-[#ebebf0] text-[#1d1d1f] font-semibold flex items-center justify-center rounded-full uppercase`}>
+      <div className={`${size} bg-[#faf6f0] text-[#2b2724] font-semibold flex items-center justify-center rounded-full uppercase`}>
         {initial}
       </div>
     );
@@ -281,7 +281,7 @@ function ArticleByID() {
                   onChange={(e) => setNewComment(e.target.value)}
                   placeholder="Share your thoughts..."
                   rows="3"
-                  className="w-full bg-[#f5f5f7] border border-transparent rounded-2xl px-4 py-3 text-[#1d1d1f] text-sm placeholder:text-[#a1a1a6] focus:outline-none focus:bg-white focus:border-[#0066cc] focus:ring-4 focus:ring-[#0066cc]/5 transition duration-200 resize-none"
+                  className="w-full bg-[#faf6f0] border border-transparent rounded-2xl px-4 py-3 text-[#2b2724] text-sm placeholder:text-[#b0a89f] focus:outline-none focus:bg-white focus:border-[#0066cc] focus:ring-4 focus:ring-[#0066cc]/5 transition duration-200 resize-none"
                 />
                 <div className="flex justify-end mt-2">
                   <button
@@ -296,8 +296,8 @@ function ArticleByID() {
             </div>
           </form>
         ) : (
-          <div className="bg-[#f5f5f7] rounded-2xl p-6 text-center mb-10 border border-[#e8e8ed]/60">
-            <p className="text-sm text-[#6e6e73] mb-4">You must be signed in to join the discussion.</p>
+          <div className="bg-[#faf6f0] rounded-2xl p-6 text-center mb-10 border border-[#eae6df]">
+            <p className="text-sm text-[#514c47] mb-4">You must be signed in to join the discussion.</p>
             <button
               onClick={() => navigate("/login")}
               className="bg-[#0066cc] text-white text-xs font-semibold px-5 py-2 rounded-full hover:bg-[#004499] transition cursor-pointer"
@@ -333,7 +333,7 @@ function ArticleByID() {
                     </div>
 
                     {/* Comment Content */}
-                    <p className="text-sm text-[#323237] leading-relaxed whitespace-pre-wrap">{commentObj.comment}</p>
+                    <p className="text-sm text-[#514c47] leading-relaxed whitespace-pre-wrap">{commentObj.comment}</p>
 
                     {/* Comment Actions */}
                     <div className="flex items-center gap-5 mt-3 text-xs text-[#86868b]">
@@ -409,12 +409,12 @@ function ArticleByID() {
                         </button>
                       )}
                     </div>
-
+ 
                     {/* Inline Reply Form */}
                     {activeReplyId === commentObj._id && (
                       <form
                         onSubmit={(e) => handleReplySubmit(e, commentObj._id)}
-                        className="mt-4 bg-[#f5f5f7] rounded-xl p-3 border border-[#e8e8ed]/60"
+                        className="mt-4 bg-[#faf6f0] rounded-xl p-3 border border-[#eae6df]"
                       >
                         <textarea
                           value={replyInputs[commentObj._id] || ""}
@@ -426,13 +426,13 @@ function ArticleByID() {
                           }
                           placeholder="Reply to this comment..."
                           rows="2"
-                          className="w-full bg-white border border-[#d2d2d7] rounded-lg px-3 py-2 text-[#1d1d1f] text-sm focus:outline-none focus:border-[#0066cc] transition resize-none"
+                          className="w-full bg-white border border-[#eae6df] rounded-lg px-3 py-2 text-[#2b2724] text-sm focus:outline-none focus:border-[#0066cc] transition resize-none"
                         />
                         <div className="flex justify-end gap-2 mt-2">
                           <button
                             type="button"
                             onClick={() => setActiveReplyId(null)}
-                            className="text-[#86868b] hover:text-[#1d1d1f] text-xs font-semibold px-3 py-1.5 rounded-full transition cursor-pointer"
+                            className="text-[#7c756e] hover:text-[#2b2724] text-xs font-semibold px-3 py-1.5 rounded-full transition cursor-pointer"
                           >
                             Cancel
                           </button>
@@ -446,10 +446,10 @@ function ArticleByID() {
                         </div>
                       </form>
                     )}
-
+ 
                     {/* Nested Replies List */}
                     {visibleReplies[commentObj._id] && commentObj.replies && commentObj.replies.length > 0 && (
-                      <div className="border-l-2 border-[#e8e8ed] pl-4 mt-4 space-y-4">
+                      <div className="border-l-2 border-[#eae6df] pl-4 mt-4 space-y-4">
                         {commentObj.replies.map((replyObj) => (
                           <div key={replyObj._id} className="flex gap-3">
                             {renderAvatar(replyObj.user, "w-7 h-7 text-[10px]")}
@@ -465,7 +465,7 @@ function ArticleByID() {
                                 )}
                                 <span className="text-[10px] text-[#a1a1a6]">{timeAgo(replyObj.createdAt)}</span>
                               </div>
-                              <p className="text-xs text-[#323237] leading-relaxed">{replyObj.reply}</p>
+                              <p className="text-xs text-[#514c47] leading-relaxed">{replyObj.reply}</p>
                             </div>
                           </div>
                         ))}

@@ -12,6 +12,7 @@ import {
   loadingClass,
   errorClass,
   timestampClass,
+  secondaryBtn,
 } from "../styles/common.js";
 
 function UserProfile() {
@@ -67,39 +68,50 @@ function UserProfile() {
   }
 
   return (
-    <div>
+    <div className="flex flex-col gap-8">
       {error && <p className={errorClass}>{error}</p>}
 
-      <div className="text-end">
-        <p className="text-2xl"> Welcome,{currentUser?.firstName}</p>
-        <img src={currentUser?.profileImageUrl} className="w-14 mr-2 rounded-full block ms-auto" alt="" />
-      </div>
-      <div className="flex justify-end mb-6 mt-3">
-        <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={onLogout}>
+      {/* Profile Welcome Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white border border-[#e8e8ed] rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.02)] gap-4">
+        <div className="flex items-center gap-4">
+          <img src={currentUser?.profileImageUrl} className="w-14 h-14 object-cover rounded-full border border-[#e8e8ed]" alt="avatar" />
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-[#64748b]">Reader Profile</p>
+            <h2 className="text-xl font-bold text-[#1d1d1f]">Welcome, {currentUser?.firstName}!</h2>
+          </div>
+        </div>
+        <button className={`${secondaryBtn} w-full sm:w-auto`} onClick={onLogout}>
           Logout
         </button>
       </div>
 
-      <div className={articleGrid}>
-        {articles.map((articleObj) => (
-          <div className={articleCardClass} key={articleObj._id}>
-            <div className="flex flex-col h-full">
-              {/* Top Content */}
-              <div>
-                <p className={articleTitle}>{articleObj.title}</p>
+      {/* Articles Section */}
+      <div className="flex flex-col gap-4">
+        <h3 className="text-lg font-bold text-[#1d1d1f] tracking-tight">Your Recommended Feed</h3>
+        <div className={articleGrid}>
+          {articles.map((articleObj) => (
+            <div className={articleCardClass} key={articleObj._id}>
+              <div className="flex flex-col h-full justify-between gap-4">
+                {/* Top Content */}
+                <div>
+                  <p className={`${articleTitle} mb-1.5`}>{articleObj.title}</p>
+                  <p className="text-xs font-semibold text-[#0066cc] uppercase tracking-wider mb-2">{articleObj.category || "General"}</p>
+                  <p className="text-sm text-[#475569] leading-relaxed mb-3">{articleObj.content.slice(0, 80)}...</p>
+                </div>
 
-                <p>{articleObj.content.slice(0, 20)}...</p>
-
-                <p className={timestampClass}>{formatDateIST(articleObj.createdAt)}</p>
+                {/* Bottom Meta & Button */}
+                <div className="border-t border-[#f1f5f9] pt-3 flex flex-col gap-3">
+                  <p className={timestampClass}>
+                    <span className="scale-90">🕒</span> {formatDateIST(articleObj.createdAt)}
+                  </p>
+                  <button className={`${ghostBtn} w-full justify-center pt-1`} onClick={() => navigateToArticleByID(articleObj)}>
+                    Read Article →
+                  </button>
+                </div>
               </div>
-
-              {/* Button at bottom */}
-              <button className={`${ghostBtn} mt-auto pt-4`} onClick={() => navigateToArticleByID(articleObj)}>
-                Read Article →
-              </button>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
